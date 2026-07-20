@@ -1,0 +1,25 @@
+{
+  "name": "laravel-blog",
+  "version": "1.0.0",
+  "description": "A full-featured blog admin panel with a REST API — built with Laravel 10, Bootstrap 5, and Laravel Sanctum.",
+  "main": "vite.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "laravel-vite-plugin": "^3.1.0",
+    "sass-embedded": "^1.99.0",
+    "vite": "^8.0.13"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8"
+  }
+}
