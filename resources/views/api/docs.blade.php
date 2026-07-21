@@ -31,11 +31,16 @@ body{background:#0d1117;color:#c9d1d9;font-family:'Segoe UI',system-ui,sans-seri
 h2{color:#e6edf3;border-bottom:1px solid #30363d;padding-bottom:.6rem;margin-top:2.2rem;margin-bottom:1.1rem;font-size:1.25rem;}
 h5{color:#e6edf3;font-size:.93rem;margin-bottom:.65rem;}
 .anote{background:#1a2232;border:1px solid #1f6feb44;border-radius:8px;padding:.85rem 1rem;margin-bottom:1.1rem;font-size:.84rem;}
-@media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;}}
+@media(max-width:768px){.sidebar{display:none;transform:translateX(-100%);position:fixed;z-index:1050;transition:transform .25s ease;}.sidebar.open{display:block;transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4);}.main{margin-left:0;padding:1rem;}.mobile-toggle{display:flex!important;}#docs-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1040;}#docs-backdrop.show{display:block;}}
 </style>
 </head>
 <body>
-<nav class="sidebar">
+<button class="mobile-toggle btn btn-sm btn-dark position-fixed top-0 start-0 m-2 d-none" style="z-index:1060" onclick="document.getElementById('api-sidebar').classList.toggle('open');document.getElementById('docs-backdrop').classList.toggle('show')">
+    <i class="bi bi-list fs-4"></i>
+</button>
+<div id="docs-backdrop" onclick="document.getElementById('api-sidebar').classList.remove('open');this.classList.remove('show')"></div>
+
+<nav class="sidebar" id="api-sidebar">
     <div class="api-brand"><i class="bi bi-braces-asterisk me-2"></i>API Reference</div>
     <div class="nav-group">Auth</div>
     <ul class="list-unstyled m-0">

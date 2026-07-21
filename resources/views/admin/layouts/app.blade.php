@@ -21,20 +21,23 @@
         .sb-badge { margin-left:auto; background:#e74c3c; color:#fff; font-size:.65rem; padding:.15em .5em; border-radius:10px; font-weight:700; }
         #topbar { height:var(--top-h); background:#fff; position:fixed; top:0; left:var(--sb-w); right:0; z-index:1030; border-bottom:1px solid #e5e9f2; display:flex; align-items:center; padding:0 1.5rem; gap:1rem; box-shadow:0 1px 3px rgba(0,0,0,.05); }
         .page-title { font-size:.95rem; font-weight:600; color:#1a1d23; }
-        .topbar-btn { border:none; background:none; padding:.4rem .5rem; border-radius:8px; color:#6c757d; cursor:pointer; }
+        .topbar-btn { border:none; background:none; padding:.6rem .7rem; border-radius:8px; color:#6c757d; cursor:pointer; min-width:44px; min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
         .topbar-btn:hover { background:#f0f2f8; }
         #main { margin-left:var(--sb-w); padding:calc(var(--top-h) + 1.5rem) 1.5rem 2rem; min-height:100vh; }
         .card-panel { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); border:none; }
         .stat-card { background:#fff; border-radius:12px; padding:1.2rem 1.4rem; box-shadow:0 1px 4px rgba(0,0,0,.06); }
         .stat-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
-        .tbl-wrap { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.06); }
-        .tbl-wrap table { margin:0; }
+        .tbl-wrap { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .tbl-wrap .table-responsive { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .tbl-wrap table { margin:0; min-width:560px; }
         .tbl-wrap thead th { background:#f8f9fc; font-size:.76rem; text-transform:uppercase; letter-spacing:.5px; border-bottom:2px solid #eaecf4; color:#6c757d; padding:.85rem 1rem; }
         .tbl-wrap tbody td { padding:.75rem 1rem; vertical-align:middle; font-size:.875rem; border-bottom:1px solid #f4f6fb; }
         .tbl-wrap tbody tr:last-child td { border-bottom:none; }
         .tbl-wrap tbody tr:hover { background:#fafbff; }
         .sbadge { font-size:.7rem; padding:.25em .7em; border-radius:20px; font-weight:600; display:inline-block; }
         .form-panel { background:#fff; border-radius:12px; padding:1.5rem; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+        .admin-table { background:#fff; border-radius:12px; box-shadow:0 1px 4px rgba(0,0,0,.06); overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .admin-table table { min-width:640px; }
         .tag-pill input[type=checkbox] { display:none; }
         .tag-pill label { cursor:pointer; padding:.28rem .75rem; border-radius:20px; border:1.5px solid #dee2e6; font-size:.8rem; transition:all .18s; display:inline-block; }
         .tag-pill input:checked + label { background:var(--sb-active); border-color:var(--sb-active); color:#fff; }
@@ -42,6 +45,8 @@
             #sidebar { transform:translateX(-100%); }
             #sidebar.open { transform:translateX(0); box-shadow:4px 0 24px rgba(0,0,0,.3); }
             #topbar, #main { left:0; margin-left:0; }
+            #sidebar-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1035; }
+            #sidebar-backdrop.show { display:block; }
         }
     </style>
     @stack('styles')
@@ -90,8 +95,10 @@
     </div>
 </nav>
 
+<div id="sidebar-backdrop" onclick="document.getElementById('sidebar').classList.remove('open');this.classList.remove('show')"></div>
+
 <header id="topbar">
-    <button class="topbar-btn d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open')">
+    <button class="topbar-btn d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-backdrop').classList.toggle('show')">
         <i class="bi bi-list fs-4"></i>
     </button>
     <span class="page-title">@yield('page-title','Dashboard')</span>
@@ -99,7 +106,7 @@
         @if($pendingComments > 0)
         <a href="{{ route('admin.comments.index') }}" class="topbar-btn position-relative text-decoration-none">
             <i class="bi bi-bell fs-5 text-muted"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">{{ $pendingComments }}</span>
+            <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger" style="font-size:.6rem">{{ $pendingComments }}</span>
         </a>
         @endif
         <a href="{{ route('admin.posts.create') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>New Post</a>

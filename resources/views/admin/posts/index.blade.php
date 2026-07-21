@@ -40,9 +40,9 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3 d-flex gap-2">
-                <button class="btn btn-primary btn-sm">Filter</button>
-                <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button class="btn btn-primary btn-sm flex-fill">Filter</button>
+                <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">Reset</a>
             </div>
         </form>
     </div>

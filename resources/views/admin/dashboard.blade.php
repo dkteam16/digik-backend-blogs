@@ -2,7 +2,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-4">
     <div>
         <h4 class="fw-bold mb-0">Dashboard</h4>
         <small class="text-muted">Welcome back, {{ auth()->user()->name }}!</small>

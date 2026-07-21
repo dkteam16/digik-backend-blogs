@@ -23,7 +23,7 @@ php artisan key:generate
 Update `.env` with your database credentials, then:
 
 ```bash
-php artisan migrate
+php artisan migrate --seed
 php artisan storage:link
 npm run build
 ```

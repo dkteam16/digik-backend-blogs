@@ -11,6 +11,7 @@
     .tag-badge input[type=checkbox] { display: none; }
     .tag-badge label { cursor: pointer; padding: .25rem .65rem; border-radius: 20px; border: 1.5px solid #dee2e6; font-size: .8rem; transition: all .2s; display: inline-block; }
     .tag-badge input:checked + label { background: #4e6ef2; border-color: #4e6ef2; color: #fff; }
+    @media(max-width:575px){.ql-toolbar.ql-snow{overflow-x:auto;flex-wrap:nowrap;}.ql-formats{white-space:nowrap;}}
 </style>
 @endpush
 

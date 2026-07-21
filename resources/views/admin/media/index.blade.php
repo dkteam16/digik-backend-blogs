@@ -30,7 +30,7 @@
                     {{ round($file['size'] / 1024, 1) }} KB
                 </div>
             </div>
-            <div class="card-footer bg-transparent p-2 border-0 d-flex gap-1">
+            <div class="card-footer bg-transparent p-2 border-0 d-flex gap-2">
                 <button class="btn btn-sm btn-outline-secondary flex-fill py-1"
                         onclick="copyUrl('{{ $file['url'] }}')" title="Copy URL">
                     <i class="bi bi-clipboard" style="font-size:.75rem"></i>
