@@ -5,6 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "darkaonline/l5-swagger": "*",
         "intervention/image": "^2.7",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",

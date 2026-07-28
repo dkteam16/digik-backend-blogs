@@ -9,27 +9,50 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+/**
+ * @OA\Tags(
+ *     name="Posts",
+ *     description="Blog post endpoints"
+ * )
+ */
 class PostController extends Controller
 {
     /**
-     * GET /api/posts
+     * @OA\Get(
+     *     path="/api/posts",
+     *     summary="List all published posts",
+     *     tags={"Posts"},
+     *     @OA\Parameter(name="category", in="query", @OA\Schema(type="string"), description="Filter by category slug"),
+     *     @OA\Parameter(name="tag", in="query", @OA\Schema(type="string"), description="Filter by tag slug"),
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string"), description="Search in title, excerpt, content"),
+     *     @OA\Parameter(name="featured", in="query", @OA\Schema(type="boolean"), description="Filter featured posts only"),
+     *     @OA\Parameter(name="sort_by", in="query", @OA\Schema(type="string", enum={"created_at","views_count","published_at"}), description="Sort field"),
+     *     @OA\Parameter(name="sort_dir", in="query", @OA\Schema(type="string", enum={"asc","desc"}), description="Sort direction"),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", maximum=50), description="Items per page"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
+     *             @OA\Property(property="meta", type="object")
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request): JsonResponse
     {
         $query = Post::with(['author', 'category', 'tags'])
             ->published();
 
-        // Filter by category slug
         if ($request->filled('category')) {
             $query->whereHas('category', fn ($q) => $q->where('slug', $request->category));
         }
 
-        // Filter by tag slug
         if ($request->filled('tag')) {
             $query->whereHas('tags', fn ($q) => $q->where('slug', $request->tag));
         }
 
-        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -39,12 +62,10 @@ class PostController extends Controller
             });
         }
 
-        // Featured only
         if ($request->boolean('featured')) {
             $query->featured();
         }
 
-        // Sort
         $sortBy  = in_array($request->sort_by, ['created_at', 'views_count', 'published_at'])
             ? $request->sort_by : 'published_at';
         $sortDir = $request->sort_dir === 'asc' ? 'asc' : 'desc';
@@ -66,7 +87,21 @@ class PostController extends Controller
     }
 
     /**
-     * GET /api/posts/{slug}
+     * @OA\Get(
+     *     path="/api/posts/{slug}",
+     *     summary="Get a single post by slug",
+     *     tags={"Posts"},
+     *     @OA\Parameter(name="slug", in="path", required=true, @OA\Schema(type="string"), description="Post slug"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Post not found")
+     * )
      */
     public function show(string $slug): JsonResponse
     {
@@ -84,7 +119,19 @@ class PostController extends Controller
     }
 
     /**
-     * GET /api/posts/featured
+     * @OA\Get(
+     *     path="/api/posts/featured",
+     *     summary="Get featured posts",
+     *     tags={"Posts"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
      */
     public function featured(): JsonResponse
     {
@@ -102,7 +149,21 @@ class PostController extends Controller
     }
 
     /**
-     * GET /api/posts/related/{slug}
+     * @OA\Get(
+     *     path="/api/posts/{slug}/related",
+     *     summary="Get related posts",
+     *     tags={"Posts"},
+     *     @OA\Parameter(name="slug", in="path", required=true, @OA\Schema(type="string"), description="Post slug"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Post not found")
+     * )
      */
     public function related(string $slug): JsonResponse
     {
@@ -123,7 +184,45 @@ class PostController extends Controller
     }
 
     /**
-     * POST /api/posts (Auth required)
+     * @OA\Post(
+     *     path="/api/posts",
+     *     summary="Create a new post",
+     *     tags={"Posts"},
+     *     security={{"sanctum":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"title","content"},
+     *                 @OA\Property(property="title", type="string", example="My New Post"),
+     *                 @OA\Property(property="excerpt", type="string", example="Post excerpt"),
+     *                 @OA\Property(property="content", type="string", example="Post content here"),
+     *                 @OA\Property(property="category_id", type="integer", example=1),
+     *                 @OA\Property(property="tags", type="array", @OA\Items(type="integer"), example={1,2}),
+     *                 @OA\Property(property="status", type="string", enum={"draft","published","scheduled"}, example="draft"),
+     *                 @OA\Property(property="is_featured", type="boolean", example=false),
+     *                 @OA\Property(property="allow_comments", type="boolean", example=true),
+     *                 @OA\Property(property="featured_image", type="string", format="binary"),
+     *                 @OA\Property(property="meta_title", type="string"),
+     *                 @OA\Property(property="meta_description", type="string"),
+     *                 @OA\Property(property="meta_keywords", type="string"),
+     *                 @OA\Property(property="published_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Post created successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Post created successfully"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=422, description="Validation failed")
+     * )
      */
     public function store(Request $request): JsonResponse
     {
@@ -164,13 +263,52 @@ class PostController extends Controller
     }
 
     /**
-     * PUT /api/posts/{id} (Auth required)
+     * @OA\Put(
+     *     path="/api/posts/{id}",
+     *     summary="Update a post",
+     *     tags={"Posts"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="Post ID"),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="title", type="string", example="Updated Post Title"),
+     *                 @OA\Property(property="excerpt", type="string"),
+     *                 @OA\Property(property="content", type="string"),
+     *                 @OA\Property(property="category_id", type="integer"),
+     *                 @OA\Property(property="tags", type="array", @OA\Items(type="integer")),
+     *                 @OA\Property(property="status", type="string", enum={"draft","published","scheduled","archived"}),
+     *                 @OA\Property(property="is_featured", type="boolean"),
+     *                 @OA\Property(property="allow_comments", type="boolean"),
+     *                 @OA\Property(property="featured_image", type="string", format="binary"),
+     *                 @OA\Property(property="meta_title", type="string"),
+     *                 @OA\Property(property="meta_description", type="string"),
+     *                 @OA\Property(property="meta_keywords", type="string"),
+     *                 @OA\Property(property="published_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Post updated successfully"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Post not found"),
+     *     @OA\Response(response=422, description="Validation failed")
+     * )
      */
     public function update(Request $request, int $id): JsonResponse
     {
         $post = Post::findOrFail($id);
 
-        // Only admin/editor or the author can update
         $user = $request->user();
         if (!$user->isEditor() && $post->author_id !== $user->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
@@ -210,7 +348,24 @@ class PostController extends Controller
     }
 
     /**
-     * DELETE /api/posts/{id} (Auth required)
+     * @OA\Delete(
+     *     path="/api/posts/{id}",
+     *     summary="Delete a post",
+     *     tags={"Posts"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="Post ID"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Post deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Post deleted successfully")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden"),
+     *     @OA\Response(response=404, description="Post not found")
+     * )
      */
     public function destroy(Request $request, int $id): JsonResponse
     {
