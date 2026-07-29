@@ -25,4 +25,7 @@ return [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name'    => env('MAIL_FROM_NAME', 'Blog Admin'),
     ],
+
+    // Internal recipient for "new subscriber" alerts. Null disables them.
+    'admin_address' => env('MAIL_ADMIN_ADDRESS') ?: null,
 ];

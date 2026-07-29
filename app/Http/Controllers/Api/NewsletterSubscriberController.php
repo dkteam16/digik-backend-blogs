@@ -3,9 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NewsletterSubscribedNotification;
+use App\Mail\NewsletterWelcomeMail;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 /**
  * @OA\Tags(
@@ -44,11 +49,34 @@ class NewsletterSubscriberController extends Controller
             'email' => 'required|email|max:255|unique:newsletter_subscribers,email',
         ]);
 
-        NewsletterSubscriber::create($validated);
+        $subscriber = NewsletterSubscriber::create($validated);
+
+        $this->sendSubscriptionMail($subscriber);
 
         return response()->json([
             'success' => true,
             'message' => 'Subscribed successfully',
         ], 201);
+    }
+
+    /**
+     * The subscriber row is already saved by this point, so a mail failure
+     * (bad credentials, SMTP timeout) is logged rather than surfaced as a
+     * failed subscription to the visitor.
+     */
+    private function sendSubscriptionMail(NewsletterSubscriber $subscriber): void
+    {
+        try {
+            Mail::to($subscriber->email)->send(new NewsletterWelcomeMail($subscriber));
+
+            if ($adminAddress = config('mail.admin_address')) {
+                Mail::to($adminAddress)->send(new NewsletterSubscribedNotification($subscriber));
+            }
+        } catch (Throwable $e) {
+            Log::error('Newsletter mail failed', [
+                'email' => $subscriber->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
