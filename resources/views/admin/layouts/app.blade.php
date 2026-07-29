@@ -7,6 +7,7 @@
     <title>@yield('title', 'Admin') — BlogAdmin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <style>
         :root { --sb-w:255px; --sb-bg:#16181d; --sb-text:#8b949e; --sb-hover:rgba(255,255,255,.05); --sb-active:#4e6ef2; --top-h:58px; }
         body { background:#f0f2f8; font-family:'Segoe UI',system-ui,sans-serif; margin:0; }
@@ -131,6 +132,18 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script>
+window.initAdminDataTable = function (selector, options) {
+    return $(selector).DataTable($.extend(true, {
+        processing: true,
+        serverSide: true,
+        dom: '<"p-3 d-flex justify-content-between align-items-center flex-wrap gap-2"l>rt<"p-3 d-flex justify-content-between align-items-center flex-wrap gap-2"ip>',
+    }, options));
+};
+</script>
 @stack('scripts')
 </body>
 </html>

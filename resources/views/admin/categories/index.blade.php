@@ -13,7 +13,7 @@
 </div>
 
 <div class="admin-table">
-    <table class="table table-hover mb-0">
+    <table id="categories-table" class="table table-hover mb-0" style="width:100%">
         <thead>
             <tr>
                 <th>Name</th>
@@ -25,43 +25,29 @@
                 <th width="120">Actions</th>
             </tr>
         </thead>
-        <tbody>
-            @forelse($categories as $category)
-            <tr>
-                <td class="fw-medium">{{ $category->name }}</td>
-                <td><code class="text-muted small">{{ $category->slug }}</code></td>
-                <td class="text-muted small">{{ $category->parent->name ?? '—' }}</td>
-                <td><span class="badge bg-secondary bg-opacity-15 text-secondary">{{ $category->posts_count }}</span></td>
-                <td>
-                    @if($category->is_active)
-                        <span class="status-badge bg-success bg-opacity-15 text-success">Active</span>
-                    @else
-                        <span class="status-badge bg-secondary bg-opacity-15 text-secondary">Inactive</span>
-                    @endif
-                </td>
-                <td class="text-muted small">{{ $category->sort_order }}</td>
-                <td>
-                    <div class="d-flex gap-1">
-                        <a href="{{ route('admin.categories.edit', $category) }}"
-                           class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
-                              onsubmit="return confirm('Delete this category?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center text-muted py-5">
-                    <i class="bi bi-folder2-open fs-2 d-block mb-2"></i>
-                    No categories yet. <a href="{{ route('admin.categories.create') }}">Create one!</a>
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
+        <tbody></tbody>
     </table>
-    <div class="p-3">{{ $categories->links() }}</div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+$(function () {
+    initAdminDataTable('#categories-table', {
+        ajax: "{{ route('admin.categories.data') }}",
+        columns: [
+            { data: 'name',          name: 'name' },
+            { data: 'slug',          name: 'slug',       orderable: false,
+              render: data => `<code class="text-muted small">${data}</code>` },
+            { data: 'parent_name',   name: 'parent.name', orderable: false },
+            { data: 'posts_count',   name: 'posts_count', orderable: false,
+              render: data => `<span class="badge bg-secondary bg-opacity-15 text-secondary">${data}</span>` },
+            { data: 'status_label',  name: 'is_active',  orderable: false },
+            { data: 'sort_order',    name: 'sort_order' },
+            { data: 'actions',       name: 'actions',    orderable: false, searchable: false },
+        ],
+        order: [[5, 'asc']],
+    });
+});
+</script>
+@endpush

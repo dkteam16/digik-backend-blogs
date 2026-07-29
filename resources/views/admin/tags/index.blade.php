@@ -34,9 +34,9 @@
     <div class="col-md-8">
         <div class="tbl-wrap">
             <div class="p-3 border-bottom">
-                <h6 class="mb-0 fw-semibold">All Tags ({{ $tags->total() }})</h6>
+                <h6 class="mb-0 fw-semibold">All Tags</h6>
             </div>
-            <table class="table">
+            <table id="tags-table" class="table" style="width:100%">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -45,32 +45,8 @@
                         <th width="130">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($tags as $tag)
-                    <tr>
-                        <td class="fw-medium">{{ $tag->name }}</td>
-                        <td><code class="text-muted small">{{ $tag->slug }}</code></td>
-                        <td><span class="sbadge bg-secondary bg-opacity-15 text-secondary">{{ $tag->posts_count }}</span></td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-outline-primary"
-                                        onclick="editTag({{ $tag->id }}, '{{ $tag->name }}')">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <form action="{{ route('admin.tags.destroy', $tag) }}" method="POST"
-                                      onsubmit="return confirm('Delete tag?')">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="4" class="text-center text-muted py-4">No tags yet.</td></tr>
-                    @endforelse
-                </tbody>
+                <tbody></tbody>
             </table>
-            <div class="p-3">{{ $tags->links() }}</div>
         </div>
     </div>
 </div>
@@ -105,5 +81,20 @@ function editTag(id, name) {
     document.getElementById('edit-form').action = `/admin/tags/${id}`;
     new bootstrap.Modal(document.getElementById('editModal')).show();
 }
+
+$(function () {
+    initAdminDataTable('#tags-table', {
+        ajax: "{{ route('admin.tags.data') }}",
+        columns: [
+            { data: 'name',        name: 'name' },
+            { data: 'slug',        name: 'slug', orderable: false,
+              render: data => `<code class="text-muted small">${data}</code>` },
+            { data: 'posts_count', name: 'posts_count', orderable: false,
+              render: data => `<span class="sbadge bg-secondary bg-opacity-15 text-secondary">${data}</span>` },
+            { data: 'actions',     name: 'actions', orderable: false, searchable: false },
+        ],
+        order: [[0, 'asc']],
+    });
+});
 </script>
 @endpush

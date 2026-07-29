@@ -18,117 +18,94 @@
 
 {{-- Filters --}}
 <div class="card-panel p-3 mb-3">
-    <form method="GET" class="row g-2 align-items-center">
+    <div class="row g-2 align-items-center">
         <div class="col-md-4">
-            <input type="text" name="search" value="{{ request('search') }}"
-                   class="form-control form-control-sm" placeholder="Search by name or content...">
+            <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search by name or content...">
         </div>
         <div class="col-md-2">
-            <select name="status" class="form-select form-select-sm">
+            <select id="filter-status" class="form-select form-select-sm">
                 <option value="">All</option>
-                <option value="pending" {{ request('status')==='pending' ? 'selected' : '' }}>Pending</option>
-                <option value="approved" {{ request('status')==='approved' ? 'selected' : '' }}>Approved</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
             </select>
         </div>
         <div class="col-auto d-flex gap-2">
-            <button class="btn btn-primary btn-sm">Filter</button>
-            <a href="{{ route('admin.comments.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            <button type="button" id="btn-filter" class="btn btn-primary btn-sm">Filter</button>
+            <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
         </div>
-    </form>
+    </div>
 </div>
 
-{{-- Bulk action --}}
+{{-- Bulk action (kept outside the table so per-row approve/reject/delete forms below are not nested inside it) --}}
 <form id="bulk-form" action="{{ route('admin.comments.bulk-action') }}" method="POST">
     @csrf
-    <div class="tbl-wrap">
-        <div class="p-3 border-bottom d-flex align-items-center gap-2">
-            <select name="action" class="form-select form-select-sm w-auto">
-                <option value="">Bulk Actions</option>
-                <option value="approve">Approve</option>
-                <option value="reject">Reject</option>
-                <option value="delete">Delete</option>
-            </select>
-            <button type="submit" class="btn btn-sm btn-secondary"
-                    onclick="return confirm('Apply action?')">Apply</button>
-            <span class="ms-auto text-muted small">{{ $comments->total() }} comments</span>
-        </div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th width="40"><input type="checkbox" id="sel-all" class="form-check-input"></th>
-                    <th>Author</th>
-                    <th>Comment</th>
-                    <th>Post</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th width="130">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($comments as $comment)
-                <tr class="{{ !$comment->is_approved ? 'table-warning bg-opacity-25' : '' }}">
-                    <td><input type="checkbox" name="comment_ids[]" value="{{ $comment->id }}" class="form-check-input cbox"></td>
-                    <td>
-                        <div class="fw-medium small">{{ $comment->author_name }}</div>
-                        <div class="text-muted" style="font-size:.75rem">{{ $comment->author_email }}</div>
-                    </td>
-                    <td class="text-muted small">{{ Str::limit($comment->content, 80) }}</td>
-                    <td class="text-muted small">
-                        @if($comment->post)
-                            <a href="{{ route('admin.posts.edit', $comment->post) }}" class="text-decoration-none">
-                                {{ Str::limit($comment->post->title, 35) }}
-                            </a>
-                        @else —
-                        @endif
-                    </td>
-                    <td>
-                        @if($comment->is_approved)
-                            <span class="sbadge bg-success bg-opacity-15 text-success">Approved</span>
-                        @else
-                            <span class="sbadge bg-warning bg-opacity-15 text-warning">Pending</span>
-                        @endif
-                    </td>
-                    <td class="text-muted small">{{ $comment->created_at->diffForHumans() }}</td>
-                    <td>
-                        <div class="d-flex gap-1 flex-wrap">
-                            @if(!$comment->is_approved)
-                            <form action="{{ route('admin.comments.approve', $comment) }}" method="POST">
-                                @csrf
-                                <button class="btn btn-sm btn-outline-success" title="Approve">
-                                    <i class="bi bi-check-lg"></i>
-                                </button>
-                            </form>
-                            @else
-                            <form action="{{ route('admin.comments.reject', $comment) }}" method="POST">
-                                @csrf
-                                <button class="btn btn-sm btn-outline-warning" title="Reject">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </form>
-                            @endif
-                            <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST"
-                                  onsubmit="return confirm('Delete comment?')">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="7" class="text-center text-muted py-5">
-                    <i class="bi bi-chat-dots fs-2 d-block mb-2"></i>No comments found.
-                </td></tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div class="p-3">{{ $comments->links() }}</div>
-    </div>
 </form>
+
+<div class="tbl-wrap">
+    <div class="p-3 border-bottom d-flex align-items-center gap-2">
+        <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
+            <option value="">Bulk Actions</option>
+            <option value="approve">Approve</option>
+            <option value="reject">Reject</option>
+            <option value="delete">Delete</option>
+        </select>
+        <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
+                onclick="return confirm('Apply action?')">Apply</button>
+    </div>
+
+    <table id="comments-table" class="table" style="width:100%">
+        <thead>
+            <tr>
+                <th width="40"><input type="checkbox" id="sel-all" class="form-check-input"></th>
+                <th>Author</th>
+                <th>Comment</th>
+                <th>Post</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th width="130">Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 @endsection
 
 @push('scripts')
 <script>
+let commentsTable;
+
+$(function () {
+    commentsTable = initAdminDataTable('#comments-table', {
+        ajax: {
+            url: "{{ route('admin.comments.data') }}",
+            data: function (d) {
+                d.status = $('#filter-status').val();
+                d.q      = $('#filter-search').val();
+            }
+        },
+        columns: [
+            { data: 'checkbox',     name: 'checkbox',     orderable: false, searchable: false },
+            { data: 'author_col',   name: 'author_name' },
+            { data: 'content_col',  name: 'content',      orderable: false },
+            { data: 'post_col',     name: 'post.title',   orderable: false },
+            { data: 'status_label', name: 'is_approved',  orderable: false },
+            { data: 'date_col',     name: 'created_at' },
+            { data: 'actions',      name: 'actions',      orderable: false, searchable: false },
+        ],
+        order: [[5, 'desc']],
+    });
+
+    $('#btn-filter').on('click', function () { commentsTable.ajax.reload(); });
+    $('#btn-reset').on('click', function () {
+        $('#filter-search').val('');
+        $('#filter-status').val('');
+        commentsTable.ajax.reload();
+    });
+    $('#filter-search').on('keyup', function (e) {
+        if (e.key === 'Enter') commentsTable.ajax.reload();
+    });
+});
+
 document.getElementById('sel-all').addEventListener('change', function() {
     document.querySelectorAll('.cbox').forEach(cb => cb.checked = this.checked);
 });

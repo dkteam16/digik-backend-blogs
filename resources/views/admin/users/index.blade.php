@@ -14,28 +14,27 @@
 </div>
 
 <div class="card-panel p-3 mb-3">
-    <form method="GET" class="row g-2 align-items-center">
+    <div class="row g-2 align-items-center">
         <div class="col-md-4">
-            <input type="text" name="search" value="{{ request('search') }}"
-                   class="form-control form-control-sm" placeholder="Search by name or email...">
+            <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search by name or email...">
         </div>
         <div class="col-md-2">
-            <select name="role" class="form-select form-select-sm">
+            <select id="filter-role" class="form-select form-select-sm">
                 <option value="">All Roles</option>
-                <option value="admin" {{ request('role')==='admin' ? 'selected' : '' }}>Admin</option>
-                <option value="editor" {{ request('role')==='editor' ? 'selected' : '' }}>Editor</option>
-                <option value="author" {{ request('role')==='author' ? 'selected' : '' }}>Author</option>
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+                <option value="author">Author</option>
             </select>
         </div>
         <div class="col-auto d-flex gap-2">
-            <button class="btn btn-primary btn-sm">Filter</button>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+            <button type="button" id="btn-filter" class="btn btn-primary btn-sm">Filter</button>
+            <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
         </div>
-    </form>
+    </div>
 </div>
 
 <div class="tbl-wrap">
-    <table class="table">
+    <table id="users-table" class="table" style="width:100%">
         <thead>
             <tr>
                 <th>User</th>
@@ -46,59 +45,45 @@
                 <th width="140">Actions</th>
             </tr>
         </thead>
-        <tbody>
-            @forelse($users as $user)
-            <tr>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold"
-                             style="width:36px;height:36px;font-size:.85rem;flex-shrink:0">
-                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                        </div>
-                        <div>
-                            <div class="fw-medium">{{ $user->name }}</div>
-                            <div class="text-muted" style="font-size:.78rem">{{ $user->email }}</div>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    @php $roleColors = ['admin'=>'danger','editor'=>'warning','author'=>'info'] @endphp
-                    <span class="sbadge bg-{{ $roleColors[$user->role] ?? 'secondary' }} bg-opacity-15 text-{{ $roleColors[$user->role] ?? 'secondary' }}">
-                        {{ ucfirst($user->role) }}
-                    </span>
-                </td>
-                <td><span class="sbadge bg-secondary bg-opacity-15 text-secondary">{{ $user->posts_count }}</span></td>
-                <td>
-                    <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm {{ $user->is_active ? 'btn-outline-success' : 'btn-outline-secondary' }}"
-                                title="{{ $user->is_active ? 'Click to deactivate' : 'Click to activate' }}">
-                            <i class="bi {{ $user->is_active ? 'bi-check-circle' : 'bi-x-circle' }}"></i>
-                            {{ $user->is_active ? 'Active' : 'Inactive' }}
-                        </button>
-                    </form>
-                </td>
-                <td class="text-muted small">{{ $user->created_at->format('M d, Y') }}</td>
-                <td>
-                    <div class="d-flex gap-1">
-                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        @if($user->id !== auth()->id())
-                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                              onsubmit="return confirm('Delete user {{ $user->name }}?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                        </form>
-                        @endif
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="6" class="text-center text-muted py-5">No users found.</td></tr>
-            @endforelse
-        </tbody>
+        <tbody></tbody>
     </table>
-    <div class="p-3">{{ $users->links() }}</div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+let usersTable;
+
+$(function () {
+    usersTable = initAdminDataTable('#users-table', {
+        ajax: {
+            url: "{{ route('admin.users.data') }}",
+            data: function (d) {
+                d.role = $('#filter-role').val();
+                d.q    = $('#filter-search').val();
+            }
+        },
+        columns: [
+            { data: 'user_col',     name: 'name' },
+            { data: 'role_label',   name: 'role',       orderable: false },
+            { data: 'posts_count',  name: 'posts_count', orderable: false,
+              render: data => `<span class="sbadge bg-secondary bg-opacity-15 text-secondary">${data}</span>` },
+            { data: 'status_label', name: 'is_active',  orderable: false },
+            { data: 'created_at',   name: 'created_at' },
+            { data: 'actions',      name: 'actions',    orderable: false, searchable: false },
+        ],
+        order: [[4, 'desc']],
+    });
+
+    $('#btn-filter').on('click', function () { usersTable.ajax.reload(); });
+    $('#btn-reset').on('click', function () {
+        $('#filter-search').val('');
+        $('#filter-role').val('');
+        usersTable.ajax.reload();
+    });
+    $('#filter-search').on('keyup', function (e) {
+        if (e.key === 'Enter') usersTable.ajax.reload();
+    });
+});
+</script>
+@endpush

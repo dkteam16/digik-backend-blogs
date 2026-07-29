@@ -4,29 +4,71 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class CommentController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = Comment::with(['post', 'user'])->latest();
+        $pendingCount = Comment::where('is_approved', false)->count();
+
+        return view('admin.comments.index', compact('pendingCount'));
+    }
+
+    public function data(Request $request): JsonResponse
+    {
+        $query = Comment::with(['post', 'user']);
 
         if ($request->filled('status')) {
             $query->where('is_approved', $request->status === 'approved');
         }
 
-        if ($request->filled('search')) {
-            $query->where('content', 'like', '%' . $request->search . '%')
-                  ->orWhere('author_name', 'like', '%' . $request->search . '%');
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('content', 'like', "%{$search}%")
+                  ->orWhere('author_name', 'like', "%{$search}%");
+            });
         }
 
-        $comments       = $query->paginate(20)->withQueryString();
-        $pendingCount   = Comment::where('is_approved', false)->count();
-
-        return view('admin.comments.index', compact('comments', 'pendingCount'));
+        return DataTables::of($query)
+            ->addColumn('checkbox', fn (Comment $comment) => '<input type="checkbox" name="comment_ids[]" value="'.$comment->id.'" form="bulk-form" class="form-check-input cbox">')
+            ->addColumn('author_col', fn (Comment $comment) => '
+                <div>
+                    <div class="fw-semibold" style="font-size:.85rem">'.e($comment->user->name ?? $comment->author_name ?? 'Guest').'</div>
+                    <small class="text-muted" style="font-size:.72rem">'.e($comment->user->email ?? $comment->author_email ?? '').'</small>
+                </div>
+            ')
+            ->addColumn('content_col', fn (Comment $comment) => Str::limit($comment->content, 80))
+            ->addColumn('post_col', fn (Comment $comment) => $comment->post
+                ? '<a href="'.route('admin.posts.edit', $comment->post).'" class="text-decoration-none text-truncate d-inline-block" style="max-width:180px">'.e($comment->post->title).'</a>'
+                : '—'
+            )
+            ->addColumn('status_label', fn (Comment $comment) => $comment->is_approved
+                ? '<span class="sbadge bg-success bg-opacity-15 text-success">Approved</span>'
+                : '<span class="sbadge bg-warning bg-opacity-15 text-warning">Pending</span>'
+            )
+            ->addColumn('date_col', fn (Comment $comment) => $comment->created_at->diffForHumans())
+            ->addColumn('actions', fn (Comment $comment) => '
+                <div class="d-flex gap-1">
+                    '.($comment->is_approved
+                        ? '<form action="'.route('admin.comments.reject', $comment).'" method="POST" class="d-inline">'.csrf_field().'<button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x-circle"></i></button></form>'
+                        : '<form action="'.route('admin.comments.approve', $comment).'" method="POST" class="d-inline">'.csrf_field().'<button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check-circle"></i></button></form>'
+                    ).'
+                    <form action="'.route('admin.comments.destroy', $comment).'" method="POST" class="d-inline" onsubmit="return confirm(\'Delete comment?\')">
+                        '.csrf_field().method_field('DELETE').'
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            ')
+            ->rawColumns(['checkbox', 'author_col', 'post_col', 'status_label', 'actions'])
+            ->setRowClass(fn (Comment $comment) => !$comment->is_approved ? 'table-warning bg-opacity-25' : '')
+            ->make(true);
     }
 
     public function approve(Comment $comment): RedirectResponse

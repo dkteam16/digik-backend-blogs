@@ -4,16 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HiringPost;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class HiringPostController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = HiringPost::with('author')->latest();
+        $departments = HiringPost::whereNotNull('department')
+            ->distinct()
+            ->pluck('department');
+
+        return view('admin.hiring-posts.index', compact('departments'));
+    }
+
+    public function data(Request $request): JsonResponse
+    {
+        $query = HiringPost::with('author');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -21,16 +32,37 @@ class HiringPostController extends Controller
         if ($request->filled('department')) {
             $query->where('department', $request->department);
         }
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+        if ($request->filled('q')) {
+            $query->where('title', 'like', '%' . $request->q . '%');
         }
 
-        $posts       = $query->paginate(15)->withQueryString();
-        $departments = HiringPost::whereNotNull('department')
-            ->distinct()
-            ->pluck('department');
-
-        return view('admin.hiring-posts.index', compact('posts', 'departments'));
+        return DataTables::of($query)
+            ->addColumn('checkbox', fn (HiringPost $post) => '<input type="checkbox" name="post_ids[]" value="'.$post->id.'" class="form-check-input post-check">')
+            ->addColumn('title_col', fn (HiringPost $post) => '
+                <div>
+                    <a href="'.route('admin.hiring-posts.edit', $post).'" class="fw-semibold text-decoration-none text-dark">'.e($post->title).'</a>
+                    '.($post->is_featured ? '<span class="badge bg-warning text-dark ms-1">Featured</span>' : '').'
+                </div>
+            ')
+            ->addColumn('employment_type_label', fn (HiringPost $post) => ucfirst($post->employment_type))
+            ->addColumn('status_label', fn (HiringPost $post) => match($post->status) {
+                'published' => '<span class="badge bg-success">Published</span>',
+                'draft'     => '<span class="badge bg-secondary">Draft</span>',
+                'closed'    => '<span class="badge bg-danger">Closed</span>',
+                'archived'  => '<span class="badge bg-warning text-dark">Archived</span>',
+                default     => '<span class="badge bg-light text-dark">'.$post->status.'</span>',
+            })
+            ->addColumn('actions', fn (HiringPost $post) => '
+                <div class="d-flex gap-1">
+                    <a href="'.route('admin.hiring-posts.edit', $post).'" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="'.route('admin.hiring-posts.destroy', $post).'" data-item-name="'.e($post->title).'"><i class="bi bi-trash"></i></button>
+                </div>
+            ')
+            ->editColumn('location', fn (HiringPost $post) => $post->location ?? '—')
+            ->editColumn('department', fn (HiringPost $post) => $post->department ?? '—')
+            ->editColumn('created_at', fn (HiringPost $post) => $post->created_at->format('M d, Y'))
+            ->rawColumns(['checkbox', 'title_col', 'status_label', 'actions'])
+            ->make(true);
     }
 
     public function create(): View

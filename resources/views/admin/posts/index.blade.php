@@ -15,36 +15,31 @@
 <!-- Filters -->
 <div class="card border-0 shadow-sm rounded-3 mb-3">
     <div class="card-body py-2">
-        <form method="GET" class="row g-2 align-items-center">
+        <div class="row g-2 align-items-center">
             <div class="col-md-4">
-                <input type="text" name="search" value="{{ request('search') }}"
-                       class="form-control form-control-sm" placeholder="Search posts...">
+                <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search posts...">
             </div>
             <div class="col-md-2">
-                <select name="status" class="form-select form-select-sm">
+                <select id="filter-status" class="form-select form-select-sm">
                     <option value="">All Statuses</option>
                     @foreach(['draft','published','scheduled','archived'] as $s)
-                        <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>
-                            {{ ucfirst($s) }}
-                        </option>
+                        <option value="{{ $s }}">{{ ucfirst($s) }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="col-md-3">
-                <select name="category" class="form-select form-select-sm">
+                <select id="filter-category" class="form-select form-select-sm">
                     <option value="">All Categories</option>
                     @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
+                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="col-12 col-md-3 d-flex gap-2">
-                <button class="btn btn-primary btn-sm flex-fill">Filter</button>
-                <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">Reset</a>
+                <button type="button" id="btn-filter" class="btn btn-primary btn-sm flex-fill">Filter</button>
+                <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm flex-fill">Reset</button>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -64,10 +59,9 @@
             </select>
             <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
                     onclick="return confirm('Apply bulk action?')">Apply</button>
-            <span class="ms-auto text-muted small">{{ $posts->total() }} posts found</span>
         </div>
 
-        <table class="table table-hover mb-0">
+        <table id="posts-table" class="table table-hover mb-0" style="width:100%">
             <thead>
                 <tr>
                     <th width="40"><input type="checkbox" id="select-all" class="form-check-input"></th>
@@ -80,57 +74,8 @@
                     <th width="120">Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse($posts as $post)
-                <tr>
-                    <td><input type="checkbox" name="post_ids[]" form="bulk-form" value="{{ $post->id }}" class="form-check-input post-check"></td>
-                    <td>
-                        <div class="fw-medium">{{ Str::limit($post->title, 50) }}</div>
-                        @if($post->is_featured)
-                            <span class="badge bg-warning bg-opacity-20 text-warning" style="font-size:.65rem">
-                                <i class="bi bi-star-fill"></i> Featured
-                            </span>
-                        @endif
-                    </td>
-                    <td class="text-muted small">{{ $post->author->name }}</td>
-                    <td class="text-muted small">{{ $post->category->name ?? '—' }}</td>
-                    <td>
-                        @php $sc = ['published'=>'success','draft'=>'warning','archived'=>'secondary','scheduled'=>'info'] @endphp
-                        <span>
-                            {{ ucfirst($post->status) }}
-                        </span>
-                    </td>
-                    <td class="text-muted small">{{ number_format($post->views_count) }}</td>
-                    <td class="text-muted small">{{ $post->created_at->format('M d, Y') }}</td>
-                    <td>
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('admin.posts.edit', $post) }}"
-                               class="btn btn-sm btn-outline-primary" title="Edit">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
-                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    data-delete-url="{{ route('admin.posts.destroy', $post) }}"
-                                    data-item-name="{{ $post->title }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="bi bi-file-earmark-text fs-2 d-block mb-2"></i>
-                        No posts found. <a href="{{ route('admin.posts.create') }}">Create one!</a>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
+            <tbody></tbody>
         </table>
-
-        <div class="p-3">
-            {{ $posts->links() }}
-        </div>
 </div>
 
 <!-- Delete Confirmation Modal (shared by all rows) -->
@@ -158,6 +103,43 @@
 
 @push('scripts')
 <script>
+let postsTable;
+
+$(function () {
+    postsTable = initAdminDataTable('#posts-table', {
+        ajax: {
+            url: "{{ route('admin.posts.data') }}",
+            data: function (d) {
+                d.status   = $('#filter-status').val();
+                d.category = $('#filter-category').val();
+                d.q        = $('#filter-search').val();
+            }
+        },
+        columns: [
+            { data: 'checkbox',      name: 'checkbox',   orderable: false, searchable: false },
+            { data: 'title_col',     name: 'title' },
+            { data: 'author_name',   name: 'author.name',   orderable: false },
+            { data: 'category_name', name: 'category.name', orderable: false },
+            { data: 'status_label',  name: 'status',        orderable: false },
+            { data: 'views_count',   name: 'views_count' },
+            { data: 'created_at',    name: 'created_at' },
+            { data: 'actions',       name: 'actions',       orderable: false, searchable: false },
+        ],
+        order: [[6, 'desc']],
+    });
+
+    $('#btn-filter').on('click', function () { postsTable.ajax.reload(); });
+    $('#btn-reset').on('click', function () {
+        $('#filter-search').val('');
+        $('#filter-status').val('');
+        $('#filter-category').val('');
+        postsTable.ajax.reload();
+    });
+    $('#filter-search').on('keyup', function (e) {
+        if (e.key === 'Enter') postsTable.ajax.reload();
+    });
+});
+
 document.getElementById('select-all').addEventListener('change', function () {
     document.querySelectorAll('.post-check').forEach(cb => cb.checked = this.checked);
 });
