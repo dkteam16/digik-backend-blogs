@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\HiringPostController;
+use App\Http\Controllers\Api\NewsletterSubscriberController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\TagController;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,9 @@ Route::name('api.')->group(function () {
     Route::get('hiring-posts',          [HiringPostController::class, 'index'])->name('hiring-posts.index');
     Route::get('hiring-posts/featured', [HiringPostController::class, 'featured'])->name('hiring-posts.featured');
     Route::get('hiring-posts/{slug}',   [HiringPostController::class, 'show'])->name('hiring-posts.show');
+
+    // Newsletter
+    Route::post('newsletter/subscribe', [NewsletterSubscriberController::class, 'store'])->name('newsletter.subscribe');
 });
 
 // ── Protected write endpoints ─────────────────────────────────

@@ -71,6 +71,7 @@
         @if($pendingComments > 0)<span class="sb-badge">{{ $pendingComments }}</span>@endif
     </a>
     <a href="{{ route('admin.media.index') }}" class="sb-link {{ request()->routeIs('admin.media.*') ? 'active' : '' }}"><i class="bi bi-images"></i> Media</a>
+    <a href="{{ route('admin.newsletter.index') }}" class="sb-link {{ request()->routeIs('admin.newsletter.*') ? 'active' : '' }}"><i class="bi bi-envelope-paper"></i> Newsletter</a>
 
     <div class="sb-section">Users</div>
     <a href="{{ route('admin.users.index') }}" class="sb-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><i class="bi bi-people"></i> All Users</a>

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HiringPostController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\UserController;
@@ -52,6 +53,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('media',          [MediaController::class, 'index'])->name('media.index');
     Route::post('media/upload',  [MediaController::class, 'upload'])->name('media.upload');
     Route::delete('media',       [MediaController::class, 'destroy'])->name('media.destroy');
+
+    Route::get('newsletter',                     [NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
+    Route::get('newsletter/data',                [NewsletterSubscriberController::class, 'data'])->name('newsletter.data');
+    Route::post('newsletter/bulk-action',         [NewsletterSubscriberController::class, 'bulkAction'])->name('newsletter.bulk-action');
+    Route::delete('newsletter/{subscriber}',      [NewsletterSubscriberController::class, 'destroy'])->name('newsletter.destroy');
 });
 
 Auth::routes();
