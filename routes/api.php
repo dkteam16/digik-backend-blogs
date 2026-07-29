@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\HiringPostController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\TagController;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,11 @@ Route::name('api.')->group(function () {
     // Tags
     Route::get('tags',        [TagController::class, 'index'])->name('tags.index');
     Route::get('tags/{slug}', [TagController::class, 'show'])->name('tags.show');
+
+    // Hiring posts (public read)
+    Route::get('hiring-posts',          [HiringPostController::class, 'index'])->name('hiring-posts.index');
+    Route::get('hiring-posts/featured', [HiringPostController::class, 'featured'])->name('hiring-posts.featured');
+    Route::get('hiring-posts/{slug}',   [HiringPostController::class, 'show'])->name('hiring-posts.show');
 });
 
 // ── Protected write endpoints ─────────────────────────────────
@@ -55,4 +61,8 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::post('posts',         [PostController::class, 'store'])->name('posts.store');
     Route::put('posts/{id}',     [PostController::class, 'update'])->name('posts.update');
     Route::delete('posts/{id}',  [PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::post('hiring-posts',        [HiringPostController::class, 'store'])->name('hiring-posts.store');
+    Route::put('hiring-posts/{id}',    [HiringPostController::class, 'update'])->name('hiring-posts.update');
+    Route::delete('hiring-posts/{id}', [HiringPostController::class, 'destroy'])->name('hiring-posts.destroy');
 });

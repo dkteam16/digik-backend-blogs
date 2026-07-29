@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HiringPostController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\TagController;
@@ -22,6 +23,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
     Route::post('posts/bulk-action', [PostController::class, 'bulkAction'])->name('posts.bulk-action');
     Route::resource('posts', PostController::class);
+
+    Route::post('hiring-posts/bulk-action', [HiringPostController::class, 'bulkAction'])->name('hiring-posts.bulk-action');
+    Route::resource('hiring-posts', HiringPostController::class);
 
     Route::resource('categories', CategoryController::class);
 

@@ -1,14 +1,14 @@
 @extends('admin.layouts.app')
-@section('title', 'Posts')
+@section('title', 'Hiring Posts')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h4 class="fw-bold mb-0">Posts</h4>
-        <small class="text-muted">Manage all blog posts</small>
+        <h4 class="fw-bold mb-0">Hiring Posts</h4>
+        <small class="text-muted">Manage job listings</small>
     </div>
-    <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i> New Post
+    <a href="{{ route('admin.hiring-posts.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> New Hiring Post
     </a>
 </div>
 
@@ -18,12 +18,12 @@
         <form method="GET" class="row g-2 align-items-center">
             <div class="col-md-4">
                 <input type="text" name="search" value="{{ request('search') }}"
-                       class="form-control form-control-sm" placeholder="Search posts...">
+                       class="form-control form-control-sm" placeholder="Search hiring posts...">
             </div>
             <div class="col-md-2">
                 <select name="status" class="form-select form-select-sm">
                     <option value="">All Statuses</option>
-                    @foreach(['draft','published','scheduled','archived'] as $s)
+                    @foreach(['draft','published','closed','archived'] as $s)
                         <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>
                             {{ ucfirst($s) }}
                         </option>
@@ -31,25 +31,25 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <select name="category" class="form-select form-select-sm">
-                    <option value="">All Categories</option>
-                    @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
+                <select name="department" class="form-select form-select-sm">
+                    <option value="">All Departments</option>
+                    @foreach($departments as $dept)
+                        <option value="{{ $dept }}" {{ request('department') === $dept ? 'selected' : '' }}>
+                            {{ $dept }}
                         </option>
                     @endforeach
                 </select>
             </div>
             <div class="col-12 col-md-3 d-flex gap-2">
                 <button class="btn btn-primary btn-sm flex-fill">Filter</button>
-                <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">Reset</a>
+                <a href="{{ route('admin.hiring-posts.index') }}" class="btn btn-outline-secondary btn-sm flex-fill">Reset</a>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Bulk Action (kept outside the table so per-row delete buttons below are not nested inside it) -->
-<form id="bulk-form" action="{{ route('admin.posts.bulk-action') }}" method="POST">
+<!-- Bulk Action (kept outside the table so per-row delete forms below are not nested inside it) -->
+<form id="bulk-form" action="{{ route('admin.hiring-posts.bulk-action') }}" method="POST">
     @csrf
 </form>
 
@@ -59,12 +59,13 @@
                 <option value="">Bulk Actions</option>
                 <option value="publish">Publish</option>
                 <option value="draft">Move to Draft</option>
+                <option value="close">Close</option>
                 <option value="archive">Archive</option>
                 <option value="delete">Delete</option>
             </select>
             <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
                     onclick="return confirm('Apply bulk action?')">Apply</button>
-            <span class="ms-auto text-muted small">{{ $posts->total() }} posts found</span>
+            <span class="ms-auto text-muted small">{{ $posts->total() }} hiring posts found</span>
         </div>
 
         <table class="table table-hover mb-0">
@@ -72,10 +73,11 @@
                 <tr>
                     <th width="40"><input type="checkbox" id="select-all" class="form-check-input"></th>
                     <th>Title</th>
-                    <th>Author</th>
-                    <th>Category</th>
+                    <th>Department</th>
+                    <th>Location</th>
+                    <th>Employment Type</th>
                     <th>Status</th>
-                    <th>Views</th>
+                    <!-- <th>Views</th> -->
                     <th>Date</th>
                     <th width="120">Actions</th>
                 </tr>
@@ -92,25 +94,26 @@
                             </span>
                         @endif
                     </td>
-                    <td class="text-muted small">{{ $post->author->name }}</td>
-                    <td class="text-muted small">{{ $post->category->name ?? '—' }}</td>
+                    <td class="text-muted small">{{ $post->department ?? '—' }}</td>
+                    <td class="text-muted small">{{ $post->location ?? '—' }}</td>
+                    <td class="text-muted small">{{ ucfirst($post->employment_type) }}</td>
                     <td>
-                        @php $sc = ['published'=>'success','draft'=>'warning','archived'=>'secondary','scheduled'=>'info'] @endphp
+                        @php $sc = ['published'=>'success','draft'=>'warning','archived'=>'secondary','closed'=>'danger'] @endphp
                         <span>
                             {{ ucfirst($post->status) }}
                         </span>
                     </td>
-                    <td class="text-muted small">{{ number_format($post->views_count) }}</td>
+                    <!-- <td class="text-muted small">{{ number_format($post->views_count) }}</td> -->
                     <td class="text-muted small">{{ $post->created_at->format('M d, Y') }}</td>
                     <td>
                         <div class="d-flex gap-1">
-                            <a href="{{ route('admin.posts.edit', $post) }}"
+                            <a href="{{ route('admin.hiring-posts.edit', $post) }}"
                                class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                    data-delete-url="{{ route('admin.posts.destroy', $post) }}"
+                                    data-delete-url="{{ route('admin.hiring-posts.destroy', $post) }}"
                                     data-item-name="{{ $post->title }}">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -119,9 +122,9 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="bi bi-file-earmark-text fs-2 d-block mb-2"></i>
-                        No posts found. <a href="{{ route('admin.posts.create') }}">Create one!</a>
+                    <td colspan="9" class="text-center text-muted py-5">
+                        <i class="bi bi-briefcase fs-2 d-block mb-2"></i>
+                        No hiring posts found. <a href="{{ route('admin.hiring-posts.create') }}">Create one!</a>
                     </td>
                 </tr>
                 @endforelse
@@ -140,7 +143,7 @@
             <form id="delete-form" method="POST">
                 @csrf @method('DELETE')
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Delete Post</h5>
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Delete Hiring Post</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

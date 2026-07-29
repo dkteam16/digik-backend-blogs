@@ -62,6 +62,7 @@
 
     <div class="sb-section">Content</div>
     <a href="{{ route('admin.posts.index') }}" class="sb-link {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}"><i class="bi bi-file-earmark-text"></i> Posts</a>
+    <a href="{{ route('admin.hiring-posts.index') }}" class="sb-link {{ request()->routeIs('admin.hiring-posts.*') ? 'active' : '' }}"><i class="bi bi-briefcase"></i> Hiring Posts</a>
     <a href="{{ route('admin.categories.index') }}" class="sb-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><i class="bi bi-folder2-open"></i> Categories</a>
     <a href="{{ route('admin.tags.index') }}" class="sb-link {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}"><i class="bi bi-tags"></i> Tags</a>
     <a href="{{ route('admin.comments.index') }}" class="sb-link {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
