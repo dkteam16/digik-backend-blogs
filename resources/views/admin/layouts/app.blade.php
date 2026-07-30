@@ -78,6 +78,7 @@
 
     <div class="sb-section">Developer</div>
     <a href="{{ route('api.docs') }}" target="_blank" class="sb-link"><i class="bi bi-braces-asterisk"></i> API Docs</a>
+    <a href="{{ route('l5-swagger.default.api') }}" target="_blank" class="sb-link"><i class="bi bi-file-earmark-code"></i> Swagger UI</a>
 
     <div class="mt-auto p-3" style="border-top:1px solid rgba(255,255,255,.06)">
         <div class="d-flex align-items-center gap-2 mb-2">

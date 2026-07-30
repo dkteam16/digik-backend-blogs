@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\HiringPostController;
+use App\Http\Controllers\Api\JobApplicationController;
 use App\Http\Controllers\Api\NewsletterSubscriberController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\TagController;
@@ -58,6 +60,16 @@ Route::name('api.')->group(function () {
 
     // Newsletter
     Route::post('newsletter/subscribe', [NewsletterSubscriberController::class, 'store'])->name('newsletter.subscribe');
+
+    // Contact form (throttled — it emails on every request, so keep bots off it)
+    Route::post('contact', [ContactController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('contact.store');
+
+    // Job application form (throttled — emails a CV attachment on every request)
+    Route::post('careers/apply', [JobApplicationController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('careers.apply');
 });
 
 // ── Protected write endpoints ─────────────────────────────────
