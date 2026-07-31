@@ -13,8 +13,14 @@ namespace App;
  *     )
  * )
  *
+ * The server url is relative on purpose: the docs are served by the same app as
+ * the API, so it resolves against whatever host is being browsed and needs no
+ * per-environment change. Templated forms like "{protocol}://{host}" only work
+ * when matching ServerVariable entries are declared, and are otherwise emitted
+ * literally, which breaks "Try it out".
+ *
  * @OA\Server(
- *     url="{protocol}://{host}",
+ *     url="/",
  *     description="API Server"
  * )
  */

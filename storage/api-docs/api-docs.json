@@ -11,11 +11,8 @@
     },
     "servers": [
         {
-            "url": "{protocol}://{host}",
+            "url": "/",
             "description": "API Server"
-        },
-        {
-            "url": "/api"
         }
     ],
     "paths": {
@@ -541,6 +538,646 @@
                     },
                     "404": {
                         "description": "Post not found or comments disabled"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                }
+            }
+        },
+        "/api/contact": {
+            "post": {
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Send a contact form enquiry",
+                "operationId": "091364660aac946c17e7253400cb3f89",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "example": "Acme Pvt Ltd"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane@acme.com"
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "example": "+91 98765 43210"
+                                    },
+                                    "industry": {
+                                        "type": "string",
+                                        "example": "Healthcare"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "We would like a quote."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Enquiry sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Thanks for reaching out! We'll get back to you shortly."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    },
+                    "500": {
+                        "description": "Enquiry could not be sent"
+                    }
+                }
+            }
+        },
+        "/api/hiring-posts": {
+            "get": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "List all published job listings",
+                "operationId": "212a2a099a7b869bc3aabd76b33a9f61",
+                "parameters": [
+                    {
+                        "name": "department",
+                        "in": "query",
+                        "description": "Filter by department",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "work_type",
+                        "in": "query",
+                        "description": "Filter by work type",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "onsite",
+                                "remote",
+                                "hybrid"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "employment_type",
+                        "in": "query",
+                        "description": "Filter by employment type",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "full-time",
+                                "part-time",
+                                "contract",
+                                "internship"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search in title, description",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "featured",
+                        "in": "query",
+                        "description": "Filter featured listings only",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "Create a new job listing",
+                "operationId": "7356d41a031f2271dc092e240d23b613",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Senior Backend Engineer"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Job description here"
+                                    },
+                                    "qualification": {
+                                        "type": "string"
+                                    },
+                                    "experience": {
+                                        "type": "string",
+                                        "example": "2-4 years"
+                                    },
+                                    "department": {
+                                        "type": "string",
+                                        "example": "Engineering"
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Remote"
+                                    },
+                                    "work_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "onsite",
+                                            "remote",
+                                            "hybrid"
+                                        ]
+                                    },
+                                    "employment_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full-time",
+                                            "part-time",
+                                            "contract",
+                                            "internship"
+                                        ]
+                                    },
+                                    "apply_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/apply"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "published",
+                                            "closed",
+                                            "archived"
+                                        ],
+                                        "example": "draft"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "application_deadline": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "meta_title": {
+                                        "type": "string"
+                                    },
+                                    "meta_description": {
+                                        "type": "string"
+                                    },
+                                    "meta_keywords": {
+                                        "type": "string"
+                                    },
+                                    "published_at": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Hiring post created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hiring post created successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/hiring-posts/{slug}": {
+            "get": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "Get a single job listing by slug",
+                "operationId": "61864a99d34a9806cb82c66b19ee33ff",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Hiring post slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Hiring post not found"
+                    }
+                }
+            }
+        },
+        "/api/hiring-posts/featured": {
+            "get": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "Get featured job listings",
+                "operationId": "cacbbeb6b19a2bcfe8038a74b012104b",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/hiring-posts/{id}": {
+            "put": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "Update a job listing",
+                "operationId": "58ca189bfc5cfd6283fcb5daecab4052",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Hiring post ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hiring post updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hiring post updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Hiring post not found"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Hiring Posts"
+                ],
+                "summary": "Delete a job listing",
+                "operationId": "811d389a092143a02013c5e459cef153",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Hiring post ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hiring post deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Hiring post deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Hiring post not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/careers/apply": {
+            "post": {
+                "tags": [
+                    "Careers"
+                ],
+                "summary": "Submit a job application with a CV",
+                "operationId": "57b474954bb9cbd842c165f1203382b3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "cv"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane@example.com"
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "example": "+91 98765 43210"
+                                    },
+                                    "area_of_interest": {
+                                        "type": "string",
+                                        "example": "Backend Development"
+                                    },
+                                    "cv": {
+                                        "description": "PDF/DOC/DOCX, max 2MB",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Application sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Thanks for applying! We'll be in touch soon."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    },
+                    "500": {
+                        "description": "Application could not be sent"
+                    }
+                }
+            }
+        },
+        "/api/newsletter/subscribe": {
+            "post": {
+                "tags": [
+                    "Newsletter"
+                ],
+                "summary": "Subscribe an email address to the newsletter",
+                "operationId": "80f47bb2ab19b31c7c0ed906d085d5b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Subscribed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Subscribed successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation failed"
@@ -1164,6 +1801,22 @@
         {
             "name": "Comments",
             "description": "Comments"
+        },
+        {
+            "name": "Contact",
+            "description": "Contact"
+        },
+        {
+            "name": "Hiring Posts",
+            "description": "Hiring Posts"
+        },
+        {
+            "name": "Careers",
+            "description": "Careers"
+        },
+        {
+            "name": "Newsletter",
+            "description": "Newsletter"
         },
         {
             "name": "Posts",

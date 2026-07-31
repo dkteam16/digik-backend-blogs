@@ -90,8 +90,12 @@ return [
 
             /*
              * Edit to set the api's base path
+             *
+             * Must stay null: every @OA\Get/@OA\Post path in this project is
+             * already absolute (e.g. "/api/posts"), so a "/api" base would be
+             * prepended a second time and produce "/api/api/posts".
              */
-            'base' => env('L5_SWAGGER_BASE_PATH', '/api'),
+            'base' => env('L5_SWAGGER_BASE_PATH', null),
 
             /*
              * Absolute path to directories that should be excluded from scanning
