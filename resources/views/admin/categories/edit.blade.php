@@ -2,8 +2,8 @@
 @section('title', 'Edit Category')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">Edit Category</h4>
+<div class="page-head">
+    <h4>Edit Category</h4>
     <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Back
     </a>
@@ -11,25 +11,25 @@
 
 <div class="row justify-content-center">
     <div class="col-md-7">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-body p-4">
+        <div class="panel">
+            <div class="panel-body">
                 <form action="{{ route('admin.categories.update', $category) }}" method="POST" enctype="multipart/form-data">
                     @csrf @method('PUT')
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                        <label class="form-label">Name <span class="req">*</span></label>
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                                value="{{ old('name', $category->name) }}" required>
                         @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Description</label>
+                        <label class="form-label">Description</label>
                         <textarea name="description" rows="3" class="form-control">{{ old('description', $category->description) }}</textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Parent Category</label>
+                        <label class="form-label">Parent Category</label>
                         <select name="parent_id" class="form-select">
                             <option value="">— None (top-level) —</option>
                             @foreach($parents as $parent)
@@ -42,7 +42,7 @@
 
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Sort Order</label>
+                            <label class="form-label">Sort Order</label>
                             <input type="number" name="sort_order" class="form-control"
                                    value="{{ old('sort_order', $category->sort_order) }}" min="0">
                         </div>
@@ -63,7 +63,7 @@
                     @endif
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">{{ $category->image ? 'Replace Image' : 'Category Image' }}</label>
+                        <label class="form-label">{{ $category->image ? 'Replace Image' : 'Category Image' }}</label>
                         <input type="file" name="image" class="form-control" accept="image/*">
                     </div>
 

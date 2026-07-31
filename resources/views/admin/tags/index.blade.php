@@ -3,50 +3,56 @@
 @section('page-title','Tags')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Tags</h4>
-        <small class="text-muted">Manage post tags</small>
+        <h4>Tags</h4>
+        <div class="sub">Manage post tags</div>
     </div>
 </div>
 
 <div class="row g-3">
     {{-- Add Tag --}}
-    <div class="col-md-4">
-        <div class="form-panel">
-            <h6 class="fw-semibold mb-3">Add New Tag</h6>
-            <form action="{{ route('admin.tags.store') }}" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label class="form-label small">Tag Name</label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
-                           value="{{ old('name') }}" placeholder="e.g. Laravel" required>
-                    @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-plus-lg me-1"></i>Add Tag
-                </button>
-            </form>
+    <div class="col-lg-4">
+        <div class="panel">
+            <div class="panel-head">
+                <h6><i class="bi bi-plus-circle me-2 text-muted"></i>Add New Tag</h6>
+            </div>
+            <div class="panel-body">
+                <form action="{{ route('admin.tags.store') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Tag Name <span class="req">*</span></label>
+                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                               value="{{ old('name') }}" placeholder="e.g. Laravel" required>
+                        @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg me-1"></i>Add Tag
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     {{-- Tags List --}}
-    <div class="col-md-8">
-        <div class="tbl-wrap">
-            <div class="p-3 border-bottom">
-                <h6 class="mb-0 fw-semibold">All Tags</h6>
+    <div class="col-lg-8">
+        <div class="panel">
+            <div class="panel-head">
+                <h6><i class="bi bi-tags me-2 text-muted"></i>All Tags</h6>
             </div>
-            <table id="tags-table" class="table" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Slug</th>
-                        <th>Posts</th>
-                        <th width="130">Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="tags-table" class="table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Posts</th>
+                            <th width="130">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -90,7 +96,7 @@ $(function () {
             { data: 'slug',        name: 'slug', orderable: false,
               render: data => `<code class="text-muted small">${data}</code>` },
             { data: 'posts_count', name: 'posts_count', orderable: false,
-              render: data => `<span class="sbadge bg-secondary bg-opacity-15 text-secondary">${data}</span>` },
+              render: data => `<span class="pill tint-secondary">${data}</span>` },
             { data: 'actions',     name: 'actions', orderable: false, searchable: false },
         ],
         order: [[0, 'asc']],

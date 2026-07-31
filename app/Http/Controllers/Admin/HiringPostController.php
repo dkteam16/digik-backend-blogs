@@ -41,19 +41,19 @@ class HiringPostController extends Controller
             ->addColumn('title_col', fn (HiringPost $post) => '
                 <div>
                     <a href="'.route('admin.hiring-posts.edit', $post).'" class="fw-semibold text-decoration-none text-dark">'.e($post->title).'</a>
-                    '.($post->is_featured ? '<span class="badge bg-warning text-dark ms-1">Featured</span>' : '').'
+                    '.($post->is_featured ? '<span class="pill tint-warning ms-1">Featured</span>' : '').'
                 </div>
             ')
             ->addColumn('employment_type_label', fn (HiringPost $post) => ucfirst($post->employment_type))
             ->addColumn('status_label', fn (HiringPost $post) => match($post->status) {
-                'published' => '<span class="badge bg-success">Published</span>',
-                'draft'     => '<span class="badge bg-secondary">Draft</span>',
-                'closed'    => '<span class="badge bg-danger">Closed</span>',
-                'archived'  => '<span class="badge bg-warning text-dark">Archived</span>',
-                default     => '<span class="badge bg-light text-dark">'.$post->status.'</span>',
+                'published' => '<span class="pill dot tint-success">Published</span>',
+                'draft'     => '<span class="pill dot tint-secondary">Draft</span>',
+                'closed'    => '<span class="pill dot tint-danger">Closed</span>',
+                'archived'  => '<span class="pill dot tint-warning">Archived</span>',
+                default     => '<span class="pill dot tint-secondary">'.$post->status.'</span>',
             })
             ->addColumn('actions', fn (HiringPost $post) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     <a href="'.route('admin.hiring-posts.edit', $post).'" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
                     <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="'.route('admin.hiring-posts.destroy', $post).'" data-item-name="'.e($post->title).'"><i class="bi bi-trash"></i></button>
                 </div>

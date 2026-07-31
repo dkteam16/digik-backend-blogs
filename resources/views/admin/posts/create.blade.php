@@ -5,21 +5,23 @@
 <!-- Quill Editor -->
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <style>
-    .ql-editor { min-height: 320px; }
-    .form-card { background: #fff; border-radius: 12px; padding: 1.5rem; border: none; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-    .tag-badge { cursor: pointer; user-select: none; }
-    .tag-badge input[type=checkbox] { display: none; }
-    .tag-badge label { cursor: pointer; padding: .25rem .65rem; border-radius: 20px; border: 1.5px solid #dee2e6; font-size: .8rem; transition: all .2s; display: inline-block; }
-    .tag-badge input:checked + label { background: #4e6ef2; border-color: #4e6ef2; color: #fff; }
+    .ql-editor { min-height: 320px; font-size:.92rem; }
+    .ql-toolbar.ql-snow { border-color:#dfe3ee; border-radius:9px 9px 0 0; background:#fbfcff; }
+    .ql-container.ql-snow { border-color:#dfe3ee; border-radius:0 0 9px 9px; }
+    .ql-snow .ql-stroke { stroke:#667085; }
+    .ql-snow .ql-fill { fill:#667085; }
+    .ql-snow .ql-picker { color:#667085; }
+    .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke:#4e6ef2; }
+    .ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill:#4e6ef2; }
     @media(max-width:575px){.ql-toolbar.ql-snow{overflow-x:auto;flex-wrap:nowrap;}.ql-formats{white-space:nowrap;}}
 </style>
 @endpush
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Create New Post</h4>
-        <small class="text-muted">Fill in the details below</small>
+        <h4>Create New Post</h4>
+        <div class="sub">Fill in the details below</div>
     </div>
     <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Back
@@ -35,14 +37,14 @@
 
             <div class="form-card mb-3">
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Post Title <span class="text-danger">*</span></label>
+                    <label class="form-label">Post Title <span class="req">*</span></label>
                     <input type="text" name="title" class="form-control form-control-lg @error('title') is-invalid @enderror"
                            value="{{ old('title') }}" placeholder="Enter post title..." required>
                     @error('title') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Excerpt</label>
+                    <label class="form-label">Excerpt</label>
                     <textarea name="excerpt" rows="2" class="form-control @error('excerpt') is-invalid @enderror"
                               placeholder="Short description (optional)...">{{ old('excerpt') }}</textarea>
                     <small class="text-muted">Leave blank to auto-generate from content.</small>
@@ -51,7 +53,7 @@
 
             <!-- Content Editor -->
             <div class="form-card mb-3">
-                <label class="form-label fw-semibold">Content <span class="text-danger">*</span></label>
+                <label class="form-label">Content <span class="req">*</span></label>
                 <div id="quill-editor">{!! old('content') !!}</div>
                 <input type="hidden" name="content" id="content-input">
                 @error('content') <div class="text-danger small mt-1">{{ $message }}</div> @enderror

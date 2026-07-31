@@ -46,17 +46,17 @@ class UserController extends Controller
                 </div>
             ')
             ->addColumn('role_label', fn (User $user) => match($user->role) {
-                'admin'  => '<span class="sbadge bg-danger bg-opacity-10 text-danger">Admin</span>',
-                'editor' => '<span class="sbadge bg-primary bg-opacity-10 text-primary">Editor</span>',
-                'author' => '<span class="sbadge bg-info bg-opacity-10 text-info">Author</span>',
-                default  => '<span class="sbadge bg-secondary bg-opacity-10 text-secondary">'.ucfirst($user->role).'</span>',
+                'admin'  => '<span class="pill tint-danger">Admin</span>',
+                'editor' => '<span class="pill tint-primary">Editor</span>',
+                'author' => '<span class="pill tint-info">Author</span>',
+                default  => '<span class="pill tint-secondary">'.ucfirst($user->role).'</span>',
             })
             ->addColumn('status_label', fn (User $user) => $user->is_active
-                ? '<span class="sbadge bg-success bg-opacity-10 text-success">Active</span>'
-                : '<span class="sbadge bg-secondary bg-opacity-10 text-secondary">Inactive</span>'
+                ? '<span class="pill dot tint-success">Active</span>'
+                : '<span class="pill dot tint-secondary">Inactive</span>'
             )
             ->addColumn('actions', fn (User $user) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     <a href="'.route('admin.users.edit', $user).'" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
                     <form action="'.route('admin.users.toggle-status', $user).'" method="POST" class="d-inline">
                         '.csrf_field().'

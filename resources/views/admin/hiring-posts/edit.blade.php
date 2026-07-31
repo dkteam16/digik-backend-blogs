@@ -4,17 +4,23 @@
 @push('styles')
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <style>
-    .ql-editor { min-height: 260px; }
-    .form-card { background: #fff; border-radius: 12px; padding: 1.5rem; border: none; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .ql-editor { min-height: 260px; font-size:.92rem; }
+    .ql-toolbar.ql-snow { border-color:#dfe3ee; border-radius:9px 9px 0 0; background:#fbfcff; }
+    .ql-container.ql-snow { border-color:#dfe3ee; border-radius:0 0 9px 9px; }
+    .ql-snow .ql-stroke { stroke:#667085; }
+    .ql-snow .ql-fill { fill:#667085; }
+    .ql-snow .ql-picker { color:#667085; }
+    .ql-snow.ql-toolbar button:hover .ql-stroke, .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke:#4e6ef2; }
+    .ql-snow.ql-toolbar button:hover .ql-fill, .ql-snow.ql-toolbar button.ql-active .ql-fill { fill:#4e6ef2; }
     @media(max-width:575px){.ql-toolbar.ql-snow{overflow-x:auto;flex-wrap:nowrap;}.ql-formats{white-space:nowrap;}}
 </style>
 @endpush
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Edit Hiring Post</h4>
-        <small class="text-muted">{{ $post->title }}</small>
+        <h4>Edit Hiring Post</h4>
+        <div class="sub">{{ $post->title }}</div>
     </div>
     <a href="{{ route('admin.hiring-posts.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Back
@@ -27,20 +33,20 @@
     <div class="row g-3">
         <div class="col-lg-8">
             <div class="form-card mb-3">
-                <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                <label class="form-label">Job Title <span class="req">*</span></label>
                 <input type="text" name="title" class="form-control form-control-lg @error('title') is-invalid @enderror"
                        value="{{ old('title', $post->title) }}" required>
                 @error('title') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
             <div class="form-card mb-3">
-                <label class="form-label fw-semibold">Job Description <span class="text-danger">*</span></label>
+                <label class="form-label">Job Description <span class="req">*</span></label>
                 <div id="quill-editor">{!! old('description', $post->description) !!}</div>
                 <input type="hidden" name="description" id="description-input">
             </div>
 
             <div class="form-card mb-3">
-                <label class="form-label fw-semibold">Qualification</label>
+                <label class="form-label">Qualification</label>
                 <textarea name="qualification" rows="4" class="form-control">{{ old('qualification', $post->qualification) }}</textarea>
             </div>
 
@@ -113,7 +119,7 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label small fw-medium">Employment Type <span class="text-danger">*</span></label>
+                    <label class="form-label small fw-medium">Employment Type <span class="req">*</span></label>
                     <select name="employment_type" class="form-select form-select-sm">
                         @foreach(['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'Contract','internship'=>'Internship'] as $val => $label)
                             <option value="{{ $val }}" {{ old('employment_type',$post->employment_type) === $val ? 'selected' : '' }}>{{ $label }}</option>

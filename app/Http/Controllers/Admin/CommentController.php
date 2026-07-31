@@ -50,12 +50,12 @@ class CommentController extends Controller
                 : '—'
             )
             ->addColumn('status_label', fn (Comment $comment) => $comment->is_approved
-                ? '<span class="sbadge bg-success bg-opacity-15 text-success">Approved</span>'
-                : '<span class="sbadge bg-warning bg-opacity-15 text-warning">Pending</span>'
+                ? '<span class="pill dot tint-success">Approved</span>'
+                : '<span class="pill dot tint-warning">Pending</span>'
             )
             ->addColumn('date_col', fn (Comment $comment) => $comment->created_at->diffForHumans())
             ->addColumn('actions', fn (Comment $comment) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     '.($comment->is_approved
                         ? '<form action="'.route('admin.comments.reject', $comment).'" method="POST" class="d-inline">'.csrf_field().'<button type="submit" class="btn btn-sm btn-outline-warning" title="Reject"><i class="bi bi-x-circle"></i></button></form>'
                         : '<form action="'.route('admin.comments.approve', $comment).'" method="POST" class="d-inline">'.csrf_field().'<button type="submit" class="btn btn-sm btn-outline-success" title="Approve"><i class="bi bi-check-circle"></i></button></form>'
@@ -67,7 +67,7 @@ class CommentController extends Controller
                 </div>
             ')
             ->rawColumns(['checkbox', 'author_col', 'post_col', 'status_label', 'actions'])
-            ->setRowClass(fn (Comment $comment) => !$comment->is_approved ? 'table-warning bg-opacity-25' : '')
+            ->setRowClass(fn (Comment $comment) => !$comment->is_approved ? 'row-pending' : '')
             ->make(true);
     }
 

@@ -29,11 +29,11 @@ class CategoryController extends Controller
         return DataTables::of($query)
             ->addColumn('parent_name', fn (Category $category) => $category->parent->name ?? '—')
             ->addColumn('status_label', fn (Category $category) => $category->is_active
-                ? '<span class="badge bg-success">Active</span>'
-                : '<span class="badge bg-secondary">Inactive</span>'
+                ? '<span class="pill dot tint-success">Active</span>'
+                : '<span class="pill dot tint-secondary">Inactive</span>'
             )
             ->addColumn('actions', fn (Category $category) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     <a href="'.route('admin.categories.edit', $category).'" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
                     <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="'.route('admin.categories.destroy', $category).'" data-item-name="'.e($category->name).'"><i class="bi bi-trash"></i></button>
                 </div>

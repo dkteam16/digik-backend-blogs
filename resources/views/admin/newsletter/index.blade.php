@@ -3,22 +3,29 @@
 @section('page-title','Newsletter')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Newsletter Subscribers</h4>
-        <small class="text-muted">{{ $totalCount }} total subscriber{{ $totalCount === 1 ? '' : 's' }}</small>
+        <h4>Newsletter Subscribers</h4>
+        <div class="sub">{{ number_format($totalCount) }} total subscriber{{ $totalCount === 1 ? '' : 's' }}</div>
     </div>
 </div>
 
 {{-- Filters --}}
-<div class="card-panel p-3 mb-3">
-    <div class="row g-2 align-items-center">
-        <div class="col-md-4">
-            <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search by email...">
-        </div>
-        <div class="col-auto d-flex gap-2">
-            <button type="button" id="btn-filter" class="btn btn-primary btn-sm">Filter</button>
-            <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+<div class="panel mb-3">
+    <div class="filter-bar">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="filter-search" class="form-control border-start-0 ps-0" placeholder="Search by email...">
+                </div>
+            </div>
+            <div class="col-auto d-flex gap-2">
+                <button type="button" id="btn-filter" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+            </div>
         </div>
     </div>
 </div>
@@ -27,27 +34,31 @@
     @csrf
 </form>
 
-<div class="tbl-wrap">
-    <div class="p-3 border-bottom d-flex align-items-center gap-2">
-        <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
-            <option value="">Bulk Actions</option>
-            <option value="delete">Delete</option>
-        </select>
-        <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
-                onclick="return confirm('Apply action?')">Apply</button>
+<div class="panel">
+    <div class="panel-head">
+        <div class="d-flex align-items-center gap-2">
+            <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
+                <option value="">Bulk Actions</option>
+                <option value="delete">Delete</option>
+            </select>
+            <button type="submit" form="bulk-form" class="btn btn-sm btn-outline-secondary"
+                    onclick="return confirm('Apply action?')">Apply</button>
+        </div>
     </div>
 
-    <table id="newsletter-table" class="table" style="width:100%">
-        <thead>
-            <tr>
-                <th width="40"><input type="checkbox" id="sel-all" class="form-check-input"></th>
-                <th>Email</th>
-                <th>Subscribed On</th>
-                <th width="80">Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="table-responsive">
+        <table id="newsletter-table" class="table" style="width:100%">
+            <thead>
+                <tr>
+                    <th width="40"><input type="checkbox" id="sel-all" class="form-check-input"></th>
+                    <th>Email</th>
+                    <th>Subscribed On</th>
+                    <th width="80">Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 @endsection
 

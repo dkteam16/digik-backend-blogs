@@ -3,35 +3,42 @@
 @section('page-title','Comments')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Comments</h4>
-        <small class="text-muted">
+        <h4>Comments</h4>
+        <div class="sub">
             @if($pendingCount > 0)
-                <span class="text-danger fw-semibold">{{ $pendingCount }} pending approval</span>
+                <span class="pill dot tint-warning">{{ $pendingCount }} pending approval</span>
             @else
-                All caught up!
+                <span class="pill dot tint-success">All caught up</span>
             @endif
-        </small>
+        </div>
     </div>
 </div>
 
 {{-- Filters --}}
-<div class="card-panel p-3 mb-3">
-    <div class="row g-2 align-items-center">
-        <div class="col-md-4">
-            <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search by name or content...">
-        </div>
-        <div class="col-md-2">
-            <select id="filter-status" class="form-select form-select-sm">
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-            </select>
-        </div>
-        <div class="col-auto d-flex gap-2">
-            <button type="button" id="btn-filter" class="btn btn-primary btn-sm">Filter</button>
-            <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+<div class="panel mb-3">
+    <div class="filter-bar">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="filter-search" class="form-control border-start-0 ps-0" placeholder="Search by name or content...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select id="filter-status" class="form-select form-select-sm">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                </select>
+            </div>
+            <div class="col-auto d-flex gap-2">
+                <button type="button" id="btn-filter" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">Reset</button>
+            </div>
         </div>
     </div>
 </div>
@@ -41,18 +48,21 @@
     @csrf
 </form>
 
-<div class="tbl-wrap">
-    <div class="p-3 border-bottom d-flex align-items-center gap-2">
-        <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
-            <option value="">Bulk Actions</option>
-            <option value="approve">Approve</option>
-            <option value="reject">Reject</option>
-            <option value="delete">Delete</option>
-        </select>
-        <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
-                onclick="return confirm('Apply action?')">Apply</button>
+<div class="panel">
+    <div class="panel-head">
+        <div class="d-flex align-items-center gap-2">
+            <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
+                <option value="">Bulk Actions</option>
+                <option value="approve">Approve</option>
+                <option value="reject">Reject</option>
+                <option value="delete">Delete</option>
+            </select>
+            <button type="submit" form="bulk-form" class="btn btn-sm btn-outline-secondary"
+                    onclick="return confirm('Apply action?')">Apply</button>
+        </div>
     </div>
 
+    <div class="table-responsive">
     <table id="comments-table" class="table" style="width:100%">
         <thead>
             <tr>
@@ -67,6 +77,7 @@
         </thead>
         <tbody></tbody>
     </table>
+    </div>
 </div>
 @endsection
 

@@ -31,10 +31,12 @@ class NewsletterSubscriberController extends Controller
             ->addColumn('checkbox', fn (NewsletterSubscriber $subscriber) => '<input type="checkbox" name="subscriber_ids[]" value="'.$subscriber->id.'" form="bulk-form" class="form-check-input cbox">')
             ->addColumn('date_col', fn (NewsletterSubscriber $subscriber) => $subscriber->created_at->format('M d, Y h:i A'))
             ->addColumn('actions', fn (NewsletterSubscriber $subscriber) => '
-                <form action="'.route('admin.newsletter.destroy', $subscriber).'" method="POST" class="d-inline" onsubmit="return confirm(\'Delete this subscriber?\')">
-                    '.csrf_field().method_field('DELETE').'
-                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
-                </form>
+                <div class="row-actions">
+                    <form action="'.route('admin.newsletter.destroy', $subscriber).'" method="POST" class="d-inline" onsubmit="return confirm(\'Delete this subscriber?\')">
+                        '.csrf_field().method_field('DELETE').'
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
             ')
             ->rawColumns(['checkbox', 'actions'])
             ->make(true);

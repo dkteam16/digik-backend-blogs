@@ -28,7 +28,7 @@ class TagController extends Controller
 
         return DataTables::of($query)
             ->addColumn('actions', fn (Tag $tag) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     <button class="btn btn-sm btn-outline-primary" onclick="editTag('.$tag->id.', \''.e($tag->name).'\')"><i class="bi bi-pencil"></i></button>
                     <form action="'.route('admin.tags.destroy', $tag).'" method="POST" class="d-inline" onsubmit="return confirm(\'Delete this tag?\')">
                         '.csrf_field().method_field('DELETE').'

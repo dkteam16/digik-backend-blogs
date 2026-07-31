@@ -43,21 +43,21 @@ class PostController extends Controller
                     '.($post->featured_image ? '<img src="'.asset('storage/'.$post->featured_image).'" class="rounded me-2" width="40" height="40" style="object-fit:cover">' : '').'
                     <div>
                         <a href="'.route('admin.posts.edit', $post).'" class="fw-semibold text-decoration-none text-dark">'.e($post->title).'</a>
-                        '.($post->is_featured ? '<span class="badge bg-warning text-dark ms-1">Featured</span>' : '').'
+                        '.($post->is_featured ? '<span class="pill tint-warning ms-1">Featured</span>' : '').'
                     </div>
                 </div>
             ')
             ->addColumn('author_name', fn (Post $post) => $post->author->name ?? '—')
             ->addColumn('category_name', fn (Post $post) => $post->category->name ?? '—')
             ->addColumn('status_label', fn (Post $post) => match($post->status) {
-                'published' => '<span class="badge bg-success">Published</span>',
-                'draft'     => '<span class="badge bg-secondary">Draft</span>',
-                'scheduled' => '<span class="badge bg-info text-dark">Scheduled</span>',
-                'archived'  => '<span class="badge bg-warning text-dark">Archived</span>',
-                default     => '<span class="badge bg-light text-dark">'.$post->status.'</span>',
+                'published' => '<span class="pill dot tint-success">Published</span>',
+                'draft'     => '<span class="pill dot tint-secondary">Draft</span>',
+                'scheduled' => '<span class="pill dot tint-info">Scheduled</span>',
+                'archived'  => '<span class="pill dot tint-warning">Archived</span>',
+                default     => '<span class="pill dot tint-secondary">'.$post->status.'</span>',
             })
             ->addColumn('actions', fn (Post $post) => '
-                <div class="d-flex gap-1">
+                <div class="row-actions">
                     <a href="'.route('admin.posts.edit', $post).'" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
                     <button type="button" class="btn btn-sm btn-outline-danger" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteModal" data-delete-url="'.route('admin.posts.destroy', $post).'" data-item-name="'.e($post->title).'"><i class="bi bi-trash"></i></button>
                 </div>

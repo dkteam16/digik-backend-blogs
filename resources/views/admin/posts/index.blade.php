@@ -2,10 +2,10 @@
 @section('title', 'Posts')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-head">
     <div>
-        <h4 class="fw-bold mb-0">Posts</h4>
-        <small class="text-muted">Manage all blog posts</small>
+        <h4>Posts</h4>
+        <div class="sub">Manage all blog posts</div>
     </div>
     <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> New Post
@@ -13,11 +13,14 @@
 </div>
 
 <!-- Filters -->
-<div class="card border-0 shadow-sm rounded-3 mb-3">
-    <div class="card-body py-2">
+<div class="panel mb-3">
+    <div class="filter-bar">
         <div class="row g-2 align-items-center">
             <div class="col-md-4">
-                <input type="text" id="filter-search" class="form-control form-control-sm" placeholder="Search posts...">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="filter-search" class="form-control border-start-0 ps-0" placeholder="Search posts...">
+                </div>
             </div>
             <div class="col-md-2">
                 <select id="filter-status" class="form-select form-select-sm">
@@ -36,7 +39,9 @@
                 </select>
             </div>
             <div class="col-12 col-md-3 d-flex gap-2">
-                <button type="button" id="btn-filter" class="btn btn-primary btn-sm flex-fill">Filter</button>
+                <button type="button" id="btn-filter" class="btn btn-primary btn-sm flex-fill">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
                 <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm flex-fill">Reset</button>
             </div>
         </div>
@@ -48,8 +53,9 @@
     @csrf
 </form>
 
-<div class="admin-table">
-        <div class="p-3 border-bottom d-flex align-items-center gap-2">
+<div class="panel">
+    <div class="panel-head">
+        <div class="d-flex align-items-center gap-2">
             <select name="action" form="bulk-form" class="form-select form-select-sm w-auto">
                 <option value="">Bulk Actions</option>
                 <option value="publish">Publish</option>
@@ -57,11 +63,13 @@
                 <option value="archive">Archive</option>
                 <option value="delete">Delete</option>
             </select>
-            <button type="submit" form="bulk-form" class="btn btn-sm btn-secondary"
+            <button type="submit" form="bulk-form" class="btn btn-sm btn-outline-secondary"
                     onclick="return confirm('Apply bulk action?')">Apply</button>
         </div>
+    </div>
 
-        <table id="posts-table" class="table table-hover mb-0" style="width:100%">
+    <div class="table-responsive">
+        <table id="posts-table" class="table mb-0" style="width:100%">
             <thead>
                 <tr>
                     <th width="40"><input type="checkbox" id="select-all" class="form-check-input"></th>
@@ -76,6 +84,7 @@
             </thead>
             <tbody></tbody>
         </table>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal (shared by all rows) -->
